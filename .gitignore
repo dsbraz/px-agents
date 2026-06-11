@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Secrets
+.env
+
+# OS / generated artifacts
+.DS_Store
+*.zip
+
+# Hermes runtime state. Only stable config/persona files are committed.
+hermes/*
+!hermes/.env.example
+!hermes/SOUL.md
+!hermes/config.yaml

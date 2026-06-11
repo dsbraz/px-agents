@@ -1,0 +1,71 @@
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: brqpx-hermes:local
+    container_name: brqpx-hermes
+    restart: unless-stopped
+    command:
+      - bash
+      - -lc
+      - /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0 --no-open --insecure & exec /opt/hermes/.venv/bin/hermes gateway run
+    ports:
+      - "127.0.0.1:8642:8642"
+      - "127.0.0.1:3978:3978"
+      - "127.0.0.1:9119:9119"
+    volumes:
+      - ./hermes:/opt/data
+    env_file:
+      - path: .env
+        required: false
+      - path: ./hermes/.env
+        required: false
+    environment:
+      HERMES_UID: ${HERMES_UID:-10000}
+      HERMES_GID: ${HERMES_GID:-10000}
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: "0.0.0.0"
+      API_SERVER_PORT: "8642"
+      API_SERVER_KEY: ${API_SERVER_KEY:-change-me-local-dev}
+      API_SERVER_MODEL_NAME: ${API_SERVER_MODEL_NAME:-brqpx-hermes}
+      HERMES_DASHBOARD_TUI: "1"
+    depends_on:
+      - mcp-planejamento-financeiro
+      - mcp-profissionais
+
+  mcp-planejamento-financeiro:
+    build:
+      context: .
+      dockerfile: mcp/Dockerfile
+    image: brqpx-mcp:local
+    container_name: brqpx-mcp-planejamento-financeiro
+    restart: unless-stopped
+    command:
+      - python
+      - -m
+      - planejamento_financeiro.server
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      MCP_PORT: "8000"
+      PORTAL_BAU_STAGING_CONNECTION_STRING: ${PORTAL_BAU_STAGING_CONNECTION_STRING:-}
+
+  mcp-profissionais:
+    build:
+      context: .
+      dockerfile: mcp/Dockerfile
+    image: brqpx-mcp:local
+    container_name: brqpx-mcp-profissionais
+    restart: unless-stopped
+    command:
+      - python
+      - -m
+      - profissionais.server
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      MCP_PORT: "8000"
+      PORTAL_BAU_STAGING_CONNECTION_STRING: ${PORTAL_BAU_STAGING_CONNECTION_STRING:-}

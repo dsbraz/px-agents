@@ -1,0 +1,4 @@
+mcp>=1.13.0
+pyodbc>=5.2.0
+pydantic>=2.8.0
+pydantic-settings>=2.4.0
